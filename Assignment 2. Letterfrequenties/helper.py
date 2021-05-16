@@ -2,10 +2,12 @@ import string
 from sklearn import preprocessing
 
 
+# Helper variables to keep track of all the possible letters and languages we are going to use
 letters = list(string.ascii_lowercase) + ['_', '?']
 languages = ['dutch', 'english']
 
 
+# Helper function to pretty print a matrix (used for debugging)
 def print_matrix(matrix):
     matrix.insert(0, letters)
     matrix = [[letters[i - 1]] + row for i, row in enumerate(matrix)]
@@ -14,6 +16,7 @@ def print_matrix(matrix):
     print(formatted, end='\n\n')
 
 
+# Helper function to get the index of a letter/space/special character
 def get_index(letter):
     if letter in letters:
         return letters.index(letter)
@@ -22,7 +25,8 @@ def get_index(letter):
         return letters.index(symbol)
 
 
-def run_every_word(line, action, *args):
+# Helper function that runs on every letter pair of a line and performs a custom action
+def run_every_pair(line, action, *args):
     words = line.split()
     for word in words:
         for i in range(len(word) - 1):
@@ -32,6 +36,7 @@ def run_every_word(line, action, *args):
             action(left_index, right_index, *args)
 
 
+# Helper function to load and return a matrix
 def get_matrix(csv):
     matrix = [[] for row in range(len(letters))]
     for i, line in enumerate(csv.readlines()):
@@ -40,6 +45,7 @@ def get_matrix(csv):
     return matrix
 
 
+# Helper function to load and return all matrices
 def get_matrices():
     matrices = {}
     for language in languages:

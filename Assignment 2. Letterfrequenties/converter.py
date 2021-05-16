@@ -1,6 +1,8 @@
 from helper import *
 
 
+# Converts the dictionaries of the chosen languages found at "https://github.com/titoBouzout/Dictionaries" 
+# to remove the data behind the backslash
 def convert(input_file, output_file):      
     lines = []
     with open(input_file, 'r', encoding='utf8') as reader:

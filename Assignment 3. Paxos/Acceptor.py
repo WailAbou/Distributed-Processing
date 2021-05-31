@@ -21,7 +21,3 @@ class Acceptor(Process):
             return Message.send_back(message, MessageTypes.ACCEPTED)
         else:
             return Message.send_back(message, MessageTypes.REJECTED)
-
-
-    def __str__(self):
-        return f'A{self.process_id}'

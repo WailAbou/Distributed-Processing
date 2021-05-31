@@ -9,3 +9,4 @@ class MessageTypes(Enum):
     REJECTED = 'REJECTED'
     FAIL = 'FAIL'
     RECOVER = 'RECOVER'
+    SUCCES = 'SUCCES'

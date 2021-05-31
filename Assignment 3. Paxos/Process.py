@@ -6,6 +6,13 @@ class Process:
         self.start_id = process_id
         self.failed = False
 
+    def recieve_fail(self):
+        self.failed = True
+        print(f'** {self} broke down **', end='')
+
+    def recieve_repair(self):
+        self.failed = False
+        print(f'** {self} is repaired **', end='')
 
     def __str__(self):
-        return self.name + self.start_id
+        return f'{self.name}{self.start_id}'

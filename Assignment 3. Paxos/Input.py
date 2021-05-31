@@ -1,6 +1,10 @@
 from MessageTypes import MessageTypes
 from Message import Message
 from Event import Event
+from Proposer import Proposer
+
+
+proposers, acceptors = {}, {}
 
 
 def read_input_file():
@@ -22,20 +26,22 @@ def create_event(event_string):
 
 
 def propose(tick, message_type, args):
-    args = [int(args[0]), int(args[1])]
-    message = Message(*args, None, MessageTypes.PROPOSE)
+    proposer_id, proposer_value = [int(args[0]), int(args[1])]
+    proposer = Proposer('P', proposer_id, proposer_value)
+    proposers[proposer_id] = proposer
+    message = Message(None, proposer, MessageTypes.PROPOSE)
     return Event(tick, [], [], message)
 
 
 def fail(tick, message_type, args):
     fail_ids = [int(proposer_id) for proposer_id in args[1:]]
-    message = Message(None, None, None, MessageTypes.FAIL)
+    message = Message(None, None, MessageTypes.FAIL)
     return Event(tick, fail_ids, [], message)
 
 
 def recover(tick, message_type, args):
     recover_ids = [int(proposer_id) for proposer_id in args[1:]]
-    message = Message(None, None, None, MessageTypes.RECOVER)
+    message = Message(None, None, MessageTypes.RECOVER)
     return Event(tick, [], recover_ids, message)
 
 

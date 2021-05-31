@@ -4,35 +4,40 @@ from MessageTypes import MessageTypes
 
 
 class Proposer(Process):
-    def __init__(self, process_id):
-        super().__init__(process_id)
-        self.suggested_value = None
-        self.accepted_value = None
+    
+    max_id = 0
+
+    def __init__(self, name, process_id, value=None):
+        super().__init__(name, process_id, value)
+        self.suggested_value = value
         self.votes = 0
         self.majority = False
         self.consensus = False
+        Proposer.max_id = max(Proposer.max_id, process_id + 1)
 
 
-    def promise(self, message, majority):
+    def recieve_promise(self, message, majority):
+        if message.source.value:
+            self.value = max(self.value, message.source.value)
+
         self.votes += 1
-        if self.votes >= majority and self.majority == False:
+        if self.votes >= majority and not self.majority:
             self.majority = True
-            return lambda acceptor: Message(acceptor, message.value, message.destination, MessageTypes.ACCEPT)
+            return lambda acceptor: Message(message.destination, acceptor, MessageTypes.ACCEPT)
 
 
-    def fail(self):
+    def recieve_fail(self):
         self.failed = True
         print(f'** {self} broke down **', end='')
 
 
-    def repair(self):
+    def recieve_repair(self):
         self.failed = False
         print(f'** {self} is repaired **', end='')
 
 
-    def accepted(self, message):
+    def recieve_accepted(self, message):
         self.consensus = True
-        self.accepted_value = message.value
 
 
     def __str__(self):

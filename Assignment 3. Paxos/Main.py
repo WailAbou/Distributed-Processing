@@ -2,12 +2,20 @@ from Proposer import Proposer
 from Acceptor import Acceptor
 from Network import Network
 from MessageTypes import MessageTypes
-from Input import read_input_file
+from Input import read_input_file, proposers, acceptors
 
 
 def simulate(n_proposers, n_acceptors, max_ticks, events):
-    proposers = { pId + 1: Proposer(pId + 1) for pId in range(n_proposers) }
-    acceptors = { aId + 1: Acceptor(aId + 1) for aId in range(n_acceptors) }
+    global proposers, acceptors
+    
+    for p_id in range(1, n_proposers + 1):
+        if p_id not in proposers:
+            proposers[p_id] = Proposer('P', p_id)
+
+    for a_id in range(1, n_acceptors + 1):
+        if a_id not in acceptors:
+            acceptors[a_id] = Acceptor('A', a_id)
+
     network = Network(proposers, acceptors)
 
     for i in range(max_ticks):
@@ -18,14 +26,13 @@ def simulate(n_proposers, n_acceptors, max_ticks, events):
         event = events.get(i)
         if event is not None:
             events.pop(i)
-            if event.message.message_type == MessageTypes.PROPOSE:
-                proposers[event.message.destination].suggested_value = event.message.value
-                event.message.destination = proposers[event.message.destination]
-                network.deliver_messsage(event.message)
-            elif event.message.message_type == MessageTypes.FAIL:
-                [proposers[proposer_id].fail() for proposer_id in event.fails]
-            elif event.message.message_type == MessageTypes.RECOVER:
-                [proposers[proposer_id].repair() for proposer_id in event.repairs]
+            message = event.message
+            if message.message_type == MessageTypes.PROPOSE:
+                network.deliver_messsage(message)
+            elif message.message_type == MessageTypes.FAIL:
+                [proposers[proposer_id].recieve_fail() for proposer_id in event.fails]
+            elif message.message_type == MessageTypes.RECOVER:
+                [proposers[proposer_id].recieve_repair() for proposer_id in event.repairs]
         else:
             message = network.extract_message()
             if message is not None:
@@ -34,7 +41,7 @@ def simulate(n_proposers, n_acceptors, max_ticks, events):
     print()
     for proposer in proposers.values():
         if proposer.consensus:
-            print(f'\n{proposer} has reached consensus (suggested: {proposer.accepted_value}, accepted: {proposer.accepted_value})', end='')
+            print(f'\n{proposer} has reached consensus (suggested: {proposer.suggested_value}, accepted: {proposer.value})', end='')
 
 
 if __name__ == "__main__":

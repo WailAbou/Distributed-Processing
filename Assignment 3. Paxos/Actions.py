@@ -1,46 +1,50 @@
+from Proposer import Proposer
 from MessageTypes import MessageTypes
 from Message import Message
 from math import ceil
 
 
-accepted_value = 0
-
+once = False
 
 def propose(network, message):
-    new_message = lambda acceptor: Message(acceptor, message.value, message.destination, MessageTypes.PREPARE)
-    [network.queue_message(new_message(acceptor)) for acceptor in network.acceptors.values()]
+    prepare_message = lambda acceptor: Message(message.destination, acceptor, MessageTypes.PREPARE)
+    [network.queue_message(prepare_message(acceptor)) for acceptor in network.acceptors.values()]
 
 
 def prepare(network, message):
-    global accepted_value
-    message.value = max(accepted_value, message.value)
-    new_message = message.destination.prepare(message)
-    accepted_value = max(new_message.value, message.value)
-    network.queue_message(new_message)
+    promise_message = message.destination.recieve_prepare(message)
+    network.queue_message(promise_message)
 
 
 def promise(network, message):
     majority = ceil(len(network.acceptors) / 2)
-    new_message = message.destination.promise(message, majority)
-    if new_message != None:
-        [network.queue_message(new_message(acceptor)) for acceptor in network.acceptors.values()]
+    accept_message = message.destination.recieve_promise(message, majority)
+    if accept_message is not None:
+        [network.queue_message(accept_message(acceptor)) for acceptor in network.acceptors.values()]
 
 
 def accept(network, message):
-    new_message = message.destination.accept(message)
-    network.queue_message(new_message)
+    accepted_or_rejected_message = message.destination.recieve_accept(message)
+    network.queue_message(accepted_or_rejected_message)
 
 
 def accepted(network, message):
-    message.destination.accepted(message)
+    message.destination.recieve_accepted(message)
 
 
 def rejected(network, message):
-    new_message = Message(message.source, message.value, message.destination, MessageTypes.PREPARE)
-    network.queue_message(new_message)
+    global once
+    if not once:
+        once = True
+        message.destination.votes = 0
+        message.destination.majority = False
+        message.destination.process_id = Proposer.max_id
+        propose(network, message)
+        # prepare_message = Message.send_back(message, MessageTypes.PREPARE)
+        # network.queue_message(prepare_message)
 
 
-action_map = { 
+send_message = { 
     MessageTypes.PROPOSE: propose,
     MessageTypes.PREPARE: prepare,
     MessageTypes.PROMISE: promise,

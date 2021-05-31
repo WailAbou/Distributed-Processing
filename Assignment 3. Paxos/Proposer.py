@@ -40,5 +40,10 @@ class Proposer(Process):
         self.consensus = True
 
 
+    def reset(self):
+        self.votes = 0
+        self.majority = False
+        self.process_id = Proposer.max_id
+
     def __str__(self):
         return f'P{self.process_id}'

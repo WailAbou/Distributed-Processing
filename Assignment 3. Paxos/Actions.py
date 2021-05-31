@@ -4,7 +4,7 @@ from Message import Message
 from math import ceil
 
 
-once = False
+rejected_once = False
 
 def propose(network, message):
     prepare_message = lambda acceptor: Message(message.destination, acceptor, MessageTypes.PREPARE)
@@ -33,15 +33,11 @@ def accepted(network, message):
 
 
 def rejected(network, message):
-    global once
-    if not once:
-        once = True
-        message.destination.votes = 0
-        message.destination.majority = False
-        message.destination.process_id = Proposer.max_id
+    global rejected_once
+    if not rejected_once:
+        rejected_once = True
+        message.destination.reset()
         propose(network, message)
-        # prepare_message = Message.send_back(message, MessageTypes.PREPARE)
-        # network.queue_message(prepare_message)
 
 
 send_message = { 

@@ -1,0 +1,1 @@
+from .Input import read_input

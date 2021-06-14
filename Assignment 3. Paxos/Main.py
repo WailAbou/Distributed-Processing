@@ -1,8 +1,7 @@
-from Proposer import Proposer
-from Acceptor import Acceptor
-from Network import Network
-from MessageTypes import MessageTypes
-from Input import read_input_file
+from Simulation.Agents import Proposer, Acceptor
+from Simulation.Network import Network
+from Simulation.Message import MessageTypes
+from Inputs import read_input
 
 
 def simulate(proposers, acceptors, max_ticks, events):
@@ -21,9 +20,9 @@ def simulate(proposers, acceptors, max_ticks, events):
             if message.message_type == MessageTypes.PROPOSE:
                 network.deliver_messsage(message)
             elif message.message_type == MessageTypes.FAIL:
-                [process.recieve_fail() for process in event.fails]
+                [agent.recieve_fail() for agent in event.fails]
             elif message.message_type == MessageTypes.RECOVER:
-                [process.recieve_repair() for process in event.repairs]
+                [agent.recieve_repair() for agent in event.repairs]
         else:
             message = network.extract_message()
             if message is not None:
@@ -36,5 +35,5 @@ def simulate(proposers, acceptors, max_ticks, events):
 
 
 if __name__ == "__main__":
-    input_variables = read_input_file()
+    input_variables = read_input('Inputs/advanced.txt')
     simulate(*input_variables)

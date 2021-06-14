@@ -1,19 +1,18 @@
-from Process import Process
-from Message import Message
-from MessageTypes import MessageTypes
+from Simulation.Agents import Agent
+from Simulation.Message import Message, MessageTypes
 
 
-class Proposer(Process):
+class Proposer(Agent):
     
     max_id = 0
 
-    def __init__(self, name, process_id, value=None):
-        super().__init__(name, process_id, value)
+    def __init__(self, name, agent_id, value=None):
+        super().__init__(name, agent_id, value)
         self.votes = 0
         self.majority = False
         self.suggested_value = None
         self.consensus = False
-        Proposer.max_id = max(Proposer.max_id, process_id + 1)
+        Proposer.max_id = max(Proposer.max_id, agent_id + 1)
 
     def recieve_promise(self, message, majority):
         if message.source.value:
@@ -34,4 +33,4 @@ class Proposer(Process):
     def reset(self):
         self.votes = 0
         self.majority = False
-        self.process_id = Proposer.max_id
+        self.agent_id = Proposer.max_id

@@ -1,4 +1,4 @@
-from Actions import send_message
+from Simulation.Network.Actions import send_message
 
 
 class Network:

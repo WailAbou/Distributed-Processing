@@ -1,9 +1,9 @@
-class Process:
-    def __init__(self, name, process_id, value):
+class Agent:
+    def __init__(self, name, agent_id, value):
         self.name = name
-        self.process_id = process_id
+        self.agent_id = agent_id
         self.value = value
-        self.start_id = process_id
+        self.start_id = agent_id
         self.failed = False
 
     def recieve_fail(self):

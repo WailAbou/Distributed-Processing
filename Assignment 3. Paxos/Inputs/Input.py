@@ -1,18 +1,16 @@
-from MessageTypes import MessageTypes
-from Message import Message
-from Event import Event
-from Proposer import Proposer
-from Acceptor import Acceptor
+from Simulation.Agents import Proposer, Acceptor
+from Simulation.Message import Message, MessageTypes
+from Simulation.Network import Event
 
 
 proposers, acceptors = {}, {}
 
 
-def read_input_file():
+def read_input(file_path):
     global proposers, acceptors
     n_proposers, n_acceptors, max_ticks, events = 0, 0, 0, {}
 
-    with open('input.txt', 'r') as file:
+    with open(file_path, 'r') as file:
         n_proposers, n_acceptors, max_ticks = [int(value) for value in file.readline().split()]
         proposers = { p_id: Proposer('P', p_id) for p_id in range(1, n_proposers + 1) }
         acceptors = { a_id: Acceptor('A', a_id) for a_id in range(1, n_acceptors + 1) }
@@ -39,23 +37,23 @@ def propose(tick, message_type, args):
 
 
 def fail(tick, message_type, args):
-    fail_processes = get_processes(args)
+    fail_agentes = get_agentes(args)
     message = Message(None, None, MessageTypes.FAIL)
-    return Event(tick, fail_processes, [], message)
+    return Event(tick, fail_agentes, [], message)
 
 
 def recover(tick, message_type, args):
-    recover_processes = get_processes(args)
+    recover_agentes = get_agentes(args)
     message = Message(None, None, MessageTypes.RECOVER)
-    return Event(tick, [], recover_processes, message)
+    return Event(tick, [], recover_agentes, message)
 
 
-def get_processes(args):
-    process_type, process_ids = args[0], [int(process_id) for process_id in args[1:]]
-    if process_type == 'PROPOSER':
-        return [proposers[proposer_id] for proposer_id in proposers if proposer_id in process_ids]
-    elif process_type == 'ACCEPTOR':
-        return [acceptors[acceptor_id] for acceptor_id in acceptors if acceptor_id in process_ids]
+def get_agentes(args):
+    agent_type, agent_ids = args[0], [int(agent_id) for agent_id in args[1:]]
+    if agent_type == 'PROPOSER':
+        return [proposers[proposer_id] for proposer_id in proposers if proposer_id in agent_ids]
+    elif agent_type == 'ACCEPTOR':
+        return [acceptors[acceptor_id] for acceptor_id in acceptors if acceptor_id in agent_ids]
 
 
 event_map = { 

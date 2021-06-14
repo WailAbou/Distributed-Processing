@@ -1,6 +1,4 @@
-from Proposer import Proposer
-from MessageTypes import MessageTypes
-from Message import Message
+from Simulation.Message import Message, MessageTypes
 from math import ceil
 
 
